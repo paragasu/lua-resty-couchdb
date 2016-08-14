@@ -53,7 +53,7 @@ function _M.put(self, id, data)
 end
 
 -- make a couchdb post request
-function _M.post(id, data)
+function _M.post(self, id, data)
   local req = self:make_request_url(id)
   local res = request.post({
     url = req,
@@ -66,12 +66,20 @@ function _M.post(id, data)
 end
 
 -- delete doc
-function _M.delete(id)
+function _M.delete(self, id)
   local res = request.get(self:make_request_url(id))
   return res.json()
 end
 
-function save(id, data)
+
+-- save document 
+-- automatically find out the latest rev
+function save(self, id, data)
+  local req = self:make_request_url(id) 
+  local res = self:get(id)
+  if res then
+    --put 
+  end 
 end
 
 -- query couchdb design doc
