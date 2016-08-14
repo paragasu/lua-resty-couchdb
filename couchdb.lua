@@ -1,4 +1,4 @@
--- Minimalist couchdb client
+-- Minimalist couchdb client for lua resty
 -- Author: Jeffry L. <paragasu@gmail.com>
 -- Website: github.com/paragasu/lua-resty-couchdb
 -- Licence: MIT
