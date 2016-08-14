@@ -12,7 +12,8 @@ description = {
 }
 dependencies = {
    "lua >= 5.1",
-   "lua-requests"
+   "lua-requests",
+   "cjson"
 }
 build = {
    type = "builtin",
