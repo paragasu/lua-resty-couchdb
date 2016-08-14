@@ -19,6 +19,7 @@ function _M.new(self, config)
   if config.user then
     request.HTTPBasicAuth(config.user, config.password)
   end
+  return setmetatable(_M, mt)
 end
 
 
