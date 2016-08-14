@@ -74,16 +74,34 @@ end
 
 -- save document 
 -- automatically find out the latest rev
-function save(self, id, data)
+function _M.save(self, id, data)
   local req = self:make_request_url(id) 
-  local res = self:get(id)
-  if res then
-    --put 
+  local old = self:get(id)
+  if old then
+    data._rev = old.body._rev
+    return self:put(id, data)
   end 
 end
 
+-- build valid view options
+-- as in http://docs.couchdb.org/en/1.6.1/api/ddoc/views.html 
+function _M.build_view_query(qstr)
+  if type(opts_or_key) == "table" then
+    return ngx.encode_args(opts_or_key)
+  else
+    return 'key="' .. opts_or_key .. '"'
+  end 
+end
+
+
 -- query couchdb design doc
-function view(design, opts)
+-- opts_or_key assume option or key if string provided
+-- construct url query format /_design/design_name/_view/view_name?opts
+-- Note: the key params must be enclosed in double quotes
+function _M.view(self, design_name, view_name, opts_or_key)
+  local s   = self:build_view_query(opts_or_key)
+  local req = { host, database, '_design', design_name, '_view',  view_name, '?' .. s } 
+  return self:get(table.concat(req, '/'))
 end
 
 return _M
