@@ -4,10 +4,10 @@
 -- Licence: MIT
 local json = require 'cjson'
 local request = require 'requests'
+local host, database
 
 local _M = { __VERSION = '0.01' }
 local mt = { __index = _M } 
-local host, database, username, password
 
 -- configuration table
 -- host, username & password
