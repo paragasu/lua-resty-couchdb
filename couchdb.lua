@@ -2,9 +2,12 @@
 -- Author: Jeffry L. <paragasu@gmail.com>
 -- Website: github.com/paragasu/lua-resty-couchdb
 -- Licence: MIT
-local json = require 'cjson'
 local request = require 'requests'
 local host, database
+
+-- check if cjson already exist in global scope
+-- as in init_by_lua_block 
+local json = json or require 'cjson'
 
 local _M = { __VERSION = '0.01' }
 local mt = { __index = _M } 
