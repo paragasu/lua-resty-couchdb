@@ -34,14 +34,14 @@ end
 
 -- make a couchdb get request
 function _M.get(self, id)
-  local res = request.get(self::make_request_url(id))
+  local res = request.get(self:make_request_url(id))
   return res.json()
 end
 
 
 -- make a couchdb put request
 function _M.put(self, id, data)
-  local req = self, make_request_url(id)
+  local req = self:make_request_url(id)
   local res = request.put({
     url = req,
     data = json.encode(data), 
@@ -54,7 +54,7 @@ end
 
 -- make a couchdb post request
 function _M.post(id, data)
-  local req = self, make_request_url(id)
+  local req = self:make_request_url(id)
   local res = request.post({
     url = req,
     data = json.encode(data), 
@@ -67,7 +67,7 @@ end
 
 -- delete doc
 function _M.delete(id)
-  local res = request.get(self::make_request_url(id))
+  local res = request.get(self:make_request_url(id))
   return res.json()
 end
 
