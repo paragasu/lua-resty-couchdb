@@ -9,8 +9,14 @@ Lua resty minimal couchdb client
 #Usage
 ```
 local couch = require 'couchdb'
+local couchdb = couch:new({
+  host: 'https://202.48.84.8:5472',
+  username: 'admin',
+  password: 'somepassword'
+})
 couchdb:database('_users')
 local res = couchdb.put(id, data)
+
 ```
 
 ### API
@@ -70,10 +76,5 @@ Query rows of data using views
 - id view id
 - opts *(json)* options parameter as [documented here](http://docs.couchdb.org/en/1.6.1/api/ddoc/views.html)
 - callback *(optional)* function to execute after request complete
-
-  host: 'https://202.48.84.8:5472',
-  username: 'admin',
-  password: 'somepassword'
-})
 
 
