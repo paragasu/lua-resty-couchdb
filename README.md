@@ -4,7 +4,7 @@ Lua resty minimal couchdb client
 #Installation
 ```
 #luarocks install lua-resty-couchdb
-
+```
 
 #Usage
 ```
