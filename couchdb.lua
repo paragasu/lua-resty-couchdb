@@ -93,7 +93,6 @@ function _M.build_view_query(qstr)
   end 
 end
 
-
 -- query couchdb design doc
 -- opts_or_key assume option or key if string provided
 -- construct url query format /_design/design_name/_view/view_name?opts
