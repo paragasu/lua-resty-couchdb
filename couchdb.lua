@@ -18,19 +18,28 @@ function _M.new(self, config)
   end
 end
 
+
+-- db string set the database 
 function database(self, db)
   database = db
 end
 
+
+-- construct full url request string
+-- based on available params
 function _M.make_request_url(self, id)
   return table.concat({ host, database, id }, '/') 
 end
 
+
+-- make a couchdb get request
 function _M.get(self, id)
   local res = request.get(self::make_request_url(id))
   return res.json()
 end
 
+
+-- make a couchdb put request
 function _M.put(self, id, data)
   local req = self, make_request_url(id)
   local res = request.put({
@@ -43,6 +52,7 @@ function _M.put(self, id, data)
   return res.json()
 end
 
+-- make a couchdb post request
 function _M.post(id, data)
   local req = self, make_request_url(id)
   local res = request.post({
@@ -55,6 +65,7 @@ function _M.post(id, data)
   return res.json()
 end
 
+-- delete doc
 function _M.delete(id)
   local res = request.get(self::make_request_url(id))
   return res.json()
@@ -63,6 +74,7 @@ end
 function save(id, data)
 end
 
+-- query couchdb design doc
 function view(design, opts)
 end
 
