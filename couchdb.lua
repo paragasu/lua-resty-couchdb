@@ -2,22 +2,21 @@
 -- Author: Jeffry L. <paragasu@gmail.com>
 -- Website: github.com/paragasu/lua-resty-couchdb
 -- Licence: MIT
-local request = require 'requests'
-local host, database
+local host, database, digest
 
 -- check if cjson already exist in global scope
 -- as in init_by_lua_block 
 local json = json or require 'cjson'
 
-local _M = { __VERSION = '0.01' }
+local _M = { __VERSION = '1.00' }
 local mt = { __index = _M } 
 
 -- configuration table
 -- host, username & password
 function _M.new(self, config)
   host = config.host
-  if config.user then
-    request.HTTPBasicAuth(config.user, config.password)
+  if config.username then
+    digest = ngx.encode_base64(config.username .. ':' .. config.password)
   end
   return setmetatable(_M, mt)
 end
@@ -38,41 +37,39 @@ end
 
 -- make a couchdb get request
 function _M.get(self, id)
-  local res = request.get(self:make_request_url(id))
-  return res.json()
+  local req = self:make_request_url(id)
+  ngx.req.set_header('Authorization', 'Basic ' .. digest)
+  return ngx.location.capture(req, { method = ngx.HTTP_GET })
 end
 
 
 -- make a couchdb put request
 function _M.put(self, id, data)
   local req = self:make_request_url(id)
-  local res = request.put({
-    url = req,
-    data = json.encode(data), 
-    headers = {
-      ['Content-Type'] = 'application/json'
-    }
-  }) 
-  return res.json()
+  local data = {
+    method = ngx.HTTP_PUT,
+    body   = json.encode(args)
+  }
+  ngx.req.set_header('Authorization', 'Basic ' .. digest)
+  return ngx.location.capture(req, data)
 end
 
 -- make a couchdb post request
 function _M.post(self, id, data)
+  local data = {
+    method = ngx.HTTP_PUT,
+    body   = json.encode(args)
+  }
   local req = self:make_request_url(id)
-  local res = request.post({
-    url = req,
-    data = json.encode(data), 
-    headers = {
-      ['Content-Type'] = 'application/json'
-    }
-  }) 
-  return res.json()
+  ngx.req.set_header('Authorization', 'Basic ' .. digest)
+  return ngx.location.capture(req, data)
 end
 
 -- delete doc
 function _M.delete(self, id)
-  local res = request.get(self:make_request_url(id))
-  return res.json()
+  local req = self:make_request_url(id)
+  ngx.req.set_header('Authorization', 'Basic ' .. digest)
+  return ngx.location.capture(req, { method = ngx.HTTP_GET })
 end
 
 
