@@ -16,6 +16,6 @@ dependencies = {
 build = {
    type = "builtin",
    modules = {
-      ["lua-couchdb"] = "couchdb.lua",
+      ["resty-couchdb"] = "couchdb.lua",
    }
 }
