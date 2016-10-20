@@ -14,6 +14,7 @@ local mt = { __index = _M }
 -- construct full url request string
 -- based on available params
 local make_request_url = function(id)
+  assert(database, nil)
   return table.concat({ database, id }, '/') 
 end
 
@@ -43,21 +44,21 @@ end
 -- make a couchdb put request
 function _M.put(self, id, data)
   local req = make_request_url(id)
-  local data = {
+  local params = {
     method = ngx.HTTP_PUT,
-    body   = json.encode(args)
+    body   = json.encode(data)
   }
-  return ngx.location.capture(req, data)
+  return ngx.location.capture(req, params)
 end
 
 -- make a couchdb post request
 function _M.post(self, id, data)
-  local data = {
+  local params = {
     method = ngx.HTTP_PUT,
-    body   = json.encode(args)
+    body   = json.encode(data)
   }
   local req = make_request_url(id)
-  return ngx.location.capture(req, data)
+  return ngx.location.capture(req, params)
 end
 
 -- delete doc
