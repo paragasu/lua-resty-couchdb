@@ -18,7 +18,7 @@ local make_request_url = function(id)
   return '/' .. database .. '/' .. id
 end
 
-
+-- check if value exist in a table
 local has_value = function(tbl, val)
   for i=1, #tbl do 
     if tbl[i] == val then return true end
@@ -26,21 +26,21 @@ local has_value = function(tbl, val)
   return false
 end
 
-
 -- build valid view options
 -- as in http://docs.couchdb.org/en/1.6.1/api/ddoc/views.html 
 -- key, startkey, endkey, start_key and end_key is json
 local build_view_query = function(opts_or_key)
   if type(opts_or_key) == 'string' then
-    return 'key=' .. json.encode(opts_or_key)
+    return 'key="' .. opts_or_key .. '"'
   end
-  local json_key = {'key', 'startkey', 'start_key', 'endkey', 'end_key'}
   local params   = {}
+  local json_key = {'key', 'startkey', 'start_key', 'endkey', 'end_key'}
   for k, v in pairs(opts_or_key) do
-    local exists = has_value(json_key, opts_or_key)
-    params[k] = exists and json.encode(v) or v
+    local exists = has_value(json_key, k)
+    local value  = exists and ngx.escape_uri(json.encode(v)) or v
+    table.insert(params, k .. '=' .. value)
   end
-  return ngx.encode_args(params)
+  return table.concat(params, '&')
 end
 
 -- configuration table
@@ -100,7 +100,6 @@ end
 -- Note: the key params must be enclosed in double quotes
 function _M.view(self, design_name, view_name, opts_or_key)
   local s   = build_view_query(opts_or_key)
-  ngx.log(ngx.ERR, inspect(s))
   local req = { '_design', design_name, '_view',  view_name, '?' .. s } 
   return self:get(table.concat(req, '/'))
 end
