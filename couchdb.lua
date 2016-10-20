@@ -6,6 +6,7 @@ local database
 
 -- check if cjson already exist in global scope
 -- as in init_by_lua_block 
+local inspect = require 'inspect'
 local json = json or require 'cjson'
 
 local _M = { __VERSION = '1.00' }
