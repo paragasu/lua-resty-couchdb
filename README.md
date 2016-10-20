@@ -16,6 +16,7 @@ location /_users {
 }
 ```
 
+on lua file
 ```
 local couch   = require 'couchdb'
 local couchdb = couch:new('_users')
