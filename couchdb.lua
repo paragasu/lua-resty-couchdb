@@ -14,7 +14,7 @@ local mt = { __index = _M }
 -- construct full url request string
 -- based on available params
 local make_request_url = function(id)
-  assert(database, nil)
+  assert(database, 'Missing database variable')
   return table.concat({ database, id }, '/') 
 end
 
