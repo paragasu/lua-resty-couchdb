@@ -66,7 +66,6 @@ function _M.delete(self, id)
   return ngx.location.capture(req, { method = ngx.HTTP_GET })
 end
 
-
 -- save document 
 -- automatically find out the latest rev
 function _M.save(self, id, data)
@@ -79,14 +78,13 @@ function _M.save(self, id, data)
   end 
 end
 
-
 -- query couchdb design doc
 -- opts_or_key assume option or key if string provided
 -- construct url query format /_design/design_name/_view/view_name?opts
 -- Note: the key params must be enclosed in double quotes
 function _M.view(self, design_name, view_name, opts_or_key)
   local s   = build_view_query(opts_or_key)
-  local req = { '', database, '_design', design_name, '_view',  view_name, '?' .. s } 
+  local req = { '_design', design_name, '_view',  view_name, '?' .. s } 
   return self:get(table.concat(req, '/'))
 end
 
