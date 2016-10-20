@@ -1,5 +1,5 @@
 #lua-resty-couchdb
-Lua resty minimal couchdb client
+Lua resty minimal couchdb client using nginx proxy ngx.location_capture
 
 #Installation
 ```
@@ -10,7 +10,6 @@ Lua resty minimal couchdb client
 ```
 local couch   = require 'couchdb'
 local config  = {
-  host: 'https://202.48.84.8:5472',
   username: 'admin',
   password: 'somepassword'
 }
