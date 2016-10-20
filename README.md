@@ -7,16 +7,18 @@ Lua resty minimal couchdb client using nginx proxy ngx.location_capture
 ```
 
 #Usage
+On nginx config
+```
+location /_users {
+  -- base64 of "username:password"
+  proxy_set_header Authorization "Basic dGVzdHN0cmluZw==";
+  proxy_pass https://localhost:5984;
+}
+```
+
 ```
 local couch   = require 'couchdb'
-local config  = {
-  username: 'admin',
-  password: 'somepassword'
-}
-
-local couchdb = couch:new(config)
--- set database to use
-couchdb:database('_users')
+local couchdb = couch:new('_users')
 local res = couchdb:put(id, data)
 
 ```
