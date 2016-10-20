@@ -73,8 +73,9 @@ function _M.save(self, id, data)
   local req = make_request_url(id) 
   local old = self:get(id)
   if old then
-    data._rev = old.body._rev
-    return self:put(id, data)
+    local params = json.decode(old.body)
+    for k,v in pairs(data) do params[k] = v end
+    return self:put(id, params)
   end 
 end
 
