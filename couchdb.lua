@@ -36,13 +36,10 @@ local build_view_query = function(opts_or_key)
   local json_key = {'key', 'startkey', 'start_key', 'endkey', 'end_key'}
   local params   = {}
   for k, v in pairs(opts_or_key) do
-    if has_value(json_key, opts_or_key) then
-      params[k] = json.encode(v)
-    else
-      params[k] = v
-    end
+    local exists = has_value(json_key, opts_or_key)
+    params[k] = exists and json.encode(v) or v
   end
-  return params
+  return ngx.encode_args(params)
 end
 
 -- configuration table
