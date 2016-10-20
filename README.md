@@ -30,15 +30,8 @@ REST API.
 #### configuration
 This api should be called first to set the correct database parameter
 before calling any database action method.
-- host eg: https://192.168.1.5:5472
-- username string
-- password string
 
-
-#### database(url)
-Database name to query to
 - database name eg: booking
-
 
 #### get(id)
 Get database value
