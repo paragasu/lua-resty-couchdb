@@ -19,21 +19,31 @@ end
 
 -- construct full url request string
 -- based on available params
-function _M.make_request_url(self, id)
+function make_request_url(self, id)
   return table.concat({ host, database, id }, '/') 
+end
+
+-- build valid view options
+-- as in http://docs.couchdb.org/en/1.6.1/api/ddoc/views.html 
+function build_view_query(qstr)
+  if type(opts_or_key) == "table" then
+    return ngx.encode_args(opts_or_key)
+  else
+    return 'key="' .. opts_or_key .. '"'
+  end 
 end
 
 
 -- make a couchdb get request
 function _M.get(self, id)
-  local req = self:make_request_url(id)
+  local req = make_request_url(id)
   return ngx.location.capture(req, { method = ngx.HTTP_GET })
 end
 
 
 -- make a couchdb put request
 function _M.put(self, id, data)
-  local req = self:make_request_url(id)
+  local req = make_request_url(id)
   local data = {
     method = ngx.HTTP_PUT,
     body   = json.encode(args)
@@ -47,13 +57,13 @@ function _M.post(self, id, data)
     method = ngx.HTTP_PUT,
     body   = json.encode(args)
   }
-  local req = self:make_request_url(id)
+  local req = make_request_url(id)
   return ngx.location.capture(req, data)
 end
 
 -- delete doc
 function _M.delete(self, id)
-  local req = self:make_request_url(id)
+  local req = make_request_url(id)
   return ngx.location.capture(req, { method = ngx.HTTP_GET })
 end
 
@@ -61,7 +71,7 @@ end
 -- save document 
 -- automatically find out the latest rev
 function _M.save(self, id, data)
-  local req = self:make_request_url(id) 
+  local req = make_request_url(id) 
   local old = self:get(id)
   if old then
     data._rev = old.body._rev
@@ -69,22 +79,13 @@ function _M.save(self, id, data)
   end 
 end
 
--- build valid view options
--- as in http://docs.couchdb.org/en/1.6.1/api/ddoc/views.html 
-function _M.build_view_query(qstr)
-  if type(opts_or_key) == "table" then
-    return ngx.encode_args(opts_or_key)
-  else
-    return 'key="' .. opts_or_key .. '"'
-  end 
-end
 
 -- query couchdb design doc
 -- opts_or_key assume option or key if string provided
 -- construct url query format /_design/design_name/_view/view_name?opts
 -- Note: the key params must be enclosed in double quotes
 function _M.view(self, design_name, view_name, opts_or_key)
-  local s   = self:build_view_query(opts_or_key)
+  local s   = build_view_query(opts_or_key)
   local req = { host, database, '_design', design_name, '_view',  view_name, '?' .. s } 
   return self:get(table.concat(req, '/'))
 end
