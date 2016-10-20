@@ -14,7 +14,7 @@ local mt = { __index = _M }
 -- construct full url request string
 -- based on available params
 local make_request_url = function(id)
-  return table.concat({ database, id }, '/') 
+  return '/' .. database .. '/' .. id
 end
 
 -- build valid view options
@@ -85,7 +85,7 @@ end
 -- Note: the key params must be enclosed in double quotes
 function _M.view(self, design_name, view_name, opts_or_key)
   local s   = build_view_query(opts_or_key)
-  local req = { database, '_design', design_name, '_view',  view_name, '?' .. s } 
+  local req = { '', database, '_design', design_name, '_view',  view_name, '?' .. s } 
   return self:get(table.concat(req, '/'))
 end
 
