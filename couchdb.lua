@@ -2,7 +2,7 @@
 -- Author: Jeffry L. <paragasu@gmail.com>
 -- Website: github.com/paragasu/lua-resty-couchdb
 -- Licence: MIT
-local host, database
+local database
 
 -- check if cjson already exist in global scope
 -- as in init_by_lua_block 
@@ -20,7 +20,7 @@ end
 -- construct full url request string
 -- based on available params
 function make_request_url(id)
-  return table.concat({ host, database, id }, '/') 
+  return table.concat({ database, id }, '/') 
 end
 
 -- build valid view options
@@ -86,7 +86,7 @@ end
 -- Note: the key params must be enclosed in double quotes
 function _M.view(self, design_name, view_name, opts_or_key)
   local s   = build_view_query(opts_or_key)
-  local req = { host, database, '_design', design_name, '_view',  view_name, '?' .. s } 
+  local req = { database, '_design', design_name, '_view',  view_name, '?' .. s } 
   return self:get(table.concat(req, '/'))
 end
 
