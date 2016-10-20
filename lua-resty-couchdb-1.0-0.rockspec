@@ -1,5 +1,5 @@
 package = "lua-resty-couchdb"
-version = "1.0.0"
+version = "1.0-0"
 source = {
    url = "git://github.com/paragasu/lua-resty-couchdb",
    tag = "v1.0-0"
