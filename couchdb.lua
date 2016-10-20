@@ -17,14 +17,32 @@ local make_request_url = function(id)
   return '/' .. database .. '/' .. id
 end
 
+
+local has_value = function(tbl, val)
+  for i=1, #tbl do 
+    if tbl[i] == val then return true end
+  end
+  return false
+end
+
+
 -- build valid view options
 -- as in http://docs.couchdb.org/en/1.6.1/api/ddoc/views.html 
+-- key, startkey, endkey, start_key and end_key is json
 local build_view_query = function(opts_or_key)
-  if type(opts_or_key) == "table" then
-    return ngx.encode_args(opts_or_key)
-  else
-    return 'key="' .. opts_or_key .. '"'
-  end 
+  if type(opts_or_key) == 'string' then
+    return 'key=' .. json.encode(opts_or_key)
+  end
+  local json_key = {'key', 'startkey', 'start_key', 'endkey', 'end_key'}
+  local params   = {}
+  for k, v in pairs(opts_or_key) do
+    if has_value(json_key, opts_or_key) then
+      params[k] = json.encode(v)
+    else
+      params[k] = v
+    end
+  end
+  return params
 end
 
 -- configuration table
