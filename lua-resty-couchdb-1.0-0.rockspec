@@ -2,7 +2,7 @@ package = "lua-resty-couchdb"
 version = "1.0.0"
 source = {
    url = "git://github.com/paragasu/lua-resty-couchdb",
-   tag = "v1.0.0"
+   tag = "v1.0-0"
 }
 description = {
    summary  = "Minimalist couchdb client for lua resty",
