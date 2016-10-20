@@ -10,7 +10,7 @@ Lua resty minimal couchdb client using nginx proxy ngx.location_capture
 On nginx config
 ```
 location /_users {
-  -- base64 of "username:password"
+  # base64 of "username:password"
   proxy_set_header Authorization "Basic dGVzdHN0cmluZw==";
   proxy_pass https://localhost:5984;
 }
