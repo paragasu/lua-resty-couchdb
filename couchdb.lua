@@ -19,7 +19,7 @@ end
 
 -- construct full url request string
 -- based on available params
-function make_request_url(self, id)
+function make_request_url(id)
   return table.concat({ host, database, id }, '/') 
 end
 
