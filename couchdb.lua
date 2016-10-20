@@ -99,6 +99,7 @@ end
 -- Note: the key params must be enclosed in double quotes
 function _M.view(self, design_name, view_name, opts_or_key)
   local s   = build_view_query(opts_or_key)
+  ngx.log(ngx.ERR, inspect(s))
   local req = { '_design', design_name, '_view',  view_name, '?' .. s } 
   return self:get(table.concat(req, '/'))
 end
