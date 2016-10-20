@@ -31,6 +31,7 @@ end
 -- configuration table
 function _M.new(self, db)
   database = db
+  print(database)
   return setmetatable(_M, mt)
 end
 
