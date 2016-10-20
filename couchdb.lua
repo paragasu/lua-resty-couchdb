@@ -11,21 +11,15 @@ local json = json or require 'cjson'
 local _M = { __VERSION = '1.00' }
 local mt = { __index = _M } 
 
--- configuration table
-function _M.new(self, db)
-  database = db
-  return setmetatable(_M, mt)
-end
-
 -- construct full url request string
 -- based on available params
-function make_request_url(id)
+local make_request_url = function(id)
   return table.concat({ database, id }, '/') 
 end
 
 -- build valid view options
 -- as in http://docs.couchdb.org/en/1.6.1/api/ddoc/views.html 
-function build_view_query(qstr)
+local build_view_query = function(opts_or_key)
   if type(opts_or_key) == "table" then
     return ngx.encode_args(opts_or_key)
   else
@@ -33,6 +27,11 @@ function build_view_query(qstr)
   end 
 end
 
+-- configuration table
+function _M.new(self, db)
+  database = db
+  return setmetatable(_M, mt)
+end
 
 -- make a couchdb get request
 function _M.get(self, id)
