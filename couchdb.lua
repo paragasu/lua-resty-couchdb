@@ -79,7 +79,13 @@ end
 -- delete doc
 function _M.delete(self, id)
   local req = make_request_url(id)
-  return ngx.location.capture(req, { method = ngx.HTTP_GET })
+  local old = self:get(id)
+  if old then
+    local data = json.decode(old.body)
+    local query = { rev = data._rev }
+    return ngx.location.capture(req, { method=ngx.HTTP_DELETE,  args=query })
+  end
+  ngx.log(ngx.ERR, 'Failed to delete :' .. id .. ' not found')
 end
 
 -- save document 
