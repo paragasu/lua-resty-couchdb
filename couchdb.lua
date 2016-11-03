@@ -55,7 +55,6 @@ function _M.get(self, id)
   return ngx.location.capture(req, { method = ngx.HTTP_GET })
 end
 
-
 -- make a couchdb put request
 function _M.put(self, id, data)
   local req = make_request_url(id)
