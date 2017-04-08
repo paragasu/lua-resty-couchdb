@@ -18,7 +18,7 @@ location /_users {
 
 on lua file
 ```
-local couch   = require 'resty-couchdb'
+local couch   = require 'resty.couchdb'
 local couchdb = couch:new('_users')
 local res = couchdb:put(id, data)
 
