@@ -1,8 +1,8 @@
 package = "lua-resty-couchdb"
-version = "1.0-0"
+version = "2.0-0"
 source = {
    url = "git://github.com/paragasu/lua-resty-couchdb",
-   tag = "v1.0-0"
+   tag = "v2.0-0"
 }
 description = {
    summary  = "Minimalist couchdb client for lua resty",
@@ -16,6 +16,6 @@ dependencies = {
 build = {
    type = "builtin",
    modules = {
-      ["resty-couchdb"] = "couchdb.lua",
+      ["resty.couchdb"] = "couchdb.lua",
    }
 }
