@@ -73,7 +73,7 @@ function _M.post(self, data)
     body   = json.encode(data)
   }
   ngx.req.set_header('Content-Type', 'application/json')
-  return ngx.location.capture(make_request_url(''), params)
+  return ngx.location.capture('/' .. database, params)
 end
 
 -- delete doc
