@@ -15,6 +15,7 @@ local mt = { __index = _M }
 -- construct full url request string
 -- based on available params
 local make_request_url = function(id)
+  if not database then error("Database not exists") end
   return '/' .. database .. '/' .. id
 end
 
@@ -44,50 +45,49 @@ local build_view_query = function(opts_or_key)
 end
 
 -- configuration table
-function _M.new(self, db)
+function _M:new(db)
   database = db
   return setmetatable(_M, mt)
 end
 
+-- create database
+function _M:create_db(db)
+  ngx.req.set_header('Content-Type', 'application/json')
+  return ngx.location.capture('/' .. db, { method = ngx.HTTP_PUT })
+end
+
 -- make a couchdb get request
-function _M.get(self, id)
+function _M:get(id)
   local req = make_request_url(id)
   return ngx.location.capture(req, { method = ngx.HTTP_GET })
 end
 
 -- make a couchdb put request
-function _M.put(self, id, data)
-  local req = make_request_url(id)
-  local params = {
-    method = ngx.HTTP_PUT,
-    body   = json.encode(data)
-  }
+function _M:put(id, data)
   ngx.req.set_header('Content-Type', 'application/json')
-  return ngx.location.capture(req, params)
+  return ngx.location.capture(make_request_url(id), { method = ngx.HTTP_PUT, body = json.encode(data) })
 end
 
 -- make a couchdb post request
-function _M.post(self, data)
-  local params = {
-    method = ngx.HTTP_POST,
-    body   = json.encode(data)
-  }
+function _M:post(data)
   ngx.req.set_header('Content-Type', 'application/json')
-  return ngx.location.capture('/' .. database, params)
+  return ngx.location.capture('/' .. database, { method = ngx.HTTP_POST, body = json.encode(data) })
 end
 
 -- http://localhost:5984/_utils/docs/api/database/find.html
-function _M.find(self, options)
+function _M:find(options)
   local params = {
     method = ngx.HTTP_POST,
     body   = json.encode(options)
   }
+  ngx.log(ngx.ERR, inspect(params))
   ngx.req.set_header('Content-Type', 'application/json')
   return ngx.location.capture('/' .. database .. '/_find', params)
 end
 
 -- delete doc
-function _M.delete(self, id)
+-- TODO: only query for existing _rev if not exists
+function _M:delete(id)
   local req = make_request_url(id)
   local old = self:get(id)
   if old then
@@ -100,7 +100,7 @@ end
 
 -- save document 
 -- automatically find out the latest rev
-function _M.save(self, id, data)
+function _M:save(id, data)
   local req = make_request_url(id) 
   local old = self:get(id)
   if old then
@@ -114,9 +114,8 @@ end
 -- opts_or_key assume option or key if string provided
 -- construct url query format /_design/design_name/_view/view_name?opts
 -- Note: the key params must be enclosed in double quotes
-function _M.view(self, design_name, view_name, opts_or_key)
-  local s   = build_view_query(opts_or_key)
-  local req = { '_design', design_name, '_view',  view_name, '?' .. s } 
+function _M:view(design_name, view_name, opts_or_key)
+  local req = { '_design', design_name, '_view',  view_name, '?' .. build_view_query(opts_or_key) } 
   return self:get(table.concat(req, '/'))
 end
 
