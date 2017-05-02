@@ -76,6 +76,16 @@ function _M.post(self, data)
   return ngx.location.capture('/' .. database, params)
 end
 
+-- http://localhost:5984/_utils/docs/api/database/find.html
+function _M.find(self, options)
+  local params = {
+    method = ngx.HTTP_POST,
+    body   = json.encode(options)
+  }
+  ngx.req.set_header('Content-Type', 'application/json')
+  return ngx.location.capture('/' .. database .. '/_find', params)
+end
+
 -- delete doc
 function _M.delete(self, id)
   local req = make_request_url(id)
