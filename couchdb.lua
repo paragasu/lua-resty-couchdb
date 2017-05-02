@@ -9,7 +9,7 @@ local database
 local inspect = require 'inspect'
 local json = json or require 'cjson'
 
-local _M = { __VERSION = '1.00' }
+local _M = { __VERSION = '2.0-1' }
 local mt = { __index = _M } 
 
 -- construct full url request string
@@ -117,6 +117,16 @@ end
 function _M:view(design_name, view_name, opts_or_key)
   local req = { '_design', design_name, '_view',  view_name, '?' .. build_view_query(opts_or_key) } 
   return self:get(table.concat(req, '/'))
+end
+
+
+-- add name in the current database members list
+function _M:add_member(name)
+  return self:put('_security', {
+    members = {
+      names = { name } 
+    } 
+  })
 end
 
 return _M

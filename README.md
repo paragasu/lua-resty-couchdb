@@ -67,6 +67,10 @@ Query rows of data using views
 - opts *(table)* options parameter as [documented here](http://docs.couchdb.org/en/1.6.1/api/ddoc/views.html)
 
 
+### create_db(database_name)
+Create new database name
+- database_name *(string)* database name 
+
 
 ## Reference
 - [CouchDB API](http://docs.couchdb.org/en/1.6.1/http-api.html)
