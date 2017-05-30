@@ -9,15 +9,6 @@ Lua resty minimal couchdb client
 
 #Usage
 ```
-location /_users {
-  # base64 of "username:password"
-  proxy_set_header Authorization "Basic dGVzdHN0cmluZw==";
-  proxy_pass https://localhost:5984;
-}
-```
-
-on lua file
-```
 local couch   = require 'resty.couchdb'
 local config  = {
   host = 'https://localhost:5984',
