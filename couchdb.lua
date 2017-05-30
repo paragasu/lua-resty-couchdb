@@ -2,7 +2,7 @@
 -- Author: Jeffry L. <paragasu@gmail.com>
 -- Website: github.com/paragasu/lua-resty-couchdb
 -- Licence: MIT
-local database, auth
+local database, auth_basic_hash
 
 -- check if cjson already exist in global scope as in init_by_lua_block 
 local i = require 'inspect'
@@ -27,7 +27,7 @@ local function request(method, url, params)
     body    = json.encode(params),
     headers = { 
       ['Content-Type']  = 'application/json',
-      ['Authorization'] = 'Basic ' .. ngx.encode_base64(auth) 
+      ['Authorization'] = 'Basic ' .. auth_basic_hash
     },
     ssl_verify = false
   })
@@ -35,10 +35,10 @@ end
 
 -- configuration table
 -- @param db string database name
--- @param auth string "username:password" 
-function _M:new(db, auth)
+-- @param auth_bash_hash string base64("username:password")
+function _M:new(db, auth_basic_hash)
   database = db
-  auth = auth
+  auth_basic_hash = auth_basic_hash
   return setmetatable(_M, mt)
 end
 
