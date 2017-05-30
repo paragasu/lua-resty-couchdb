@@ -41,7 +41,7 @@ function _M:db(dbname)
       ssl_verify = false
     }
     local url = create_url(path, method, params)
-    --ngx.log(ngx.ERR, 'request ', url, i(args))
+    ngx.log(ngx.ERR, 'request ', url, i(args))
     return httpc:request_uri(url, args)
   end
 
@@ -53,13 +53,15 @@ function _M:db(dbname)
     if not database then error("Database not exists") end
     if not id then return _M.host .. '/' .. database end
     local url = _M.host .. '/' .. database .. '/' .. id 
-    if params == nil or method ~= ngx.HTTP_GET then return url end
-    return url .. '?' .. ngx.encode_args(params) 
+    if params ~= nil and (method == 'GET' or method == 'DELETE') then
+      return url .. '?' .. ngx.encode_args(params) 
+    end
+    return url
   end
 
   -- create database
   function self:create(db)
-    request(ngx.HTTP_PUT)
+    request('PUT')
   end
 
   -- add name in the current database members list
@@ -69,17 +71,17 @@ function _M:db(dbname)
 
   -- make a couchdb get request
   function self:get(id)
-    return request(ngx.HTTP_GET, id)
+    return request('GET', id)
   end
 
   -- make a couchdb put request
   function self:put(id, data)
-    return request(ngx.HTTP_PUT, id, data) 
+    return request('PUT', id, data) 
   end
 
   -- make a couchdb post request
   function self:post(data)
-    return request(ngx.HTTP_POST, nil, data)
+    return request('POST', nil, data)
   end
 
   -- http://localhost:5984/_utils/docs/api/database/find.html
