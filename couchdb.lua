@@ -12,13 +12,6 @@ local json = json or require 'cjson'
 local _M = { __VERSION = '2.0-1' }
 local mt = { __index = _M } 
 
--- construct full url request string
--- based on available params
-local function make_request_url(id)
-  if not database then error("Database not exists") end
-  if not id then return '/' .. database end
-  return '/' .. database .. '/' .. id
-end
 
 local function request(method, url, params)
   local httpc = http.new()
@@ -33,13 +26,29 @@ local function request(method, url, params)
   })
 end
 
+-- construct full url request string
+-- based on available params
+local function make_request_url(id)
+  if not database then error("Database not exists") end
+  if not id then return '/' .. database end
+  return '/' .. database .. '/' .. id
+end
+
 -- configuration table
--- @param db string database name
--- @param auth_bash_hash string base64("username:password")
-function _M:new(db, auth_basic_hash)
-  database = db
-  auth_basic_hash = auth_basic_hash
+-- @param config table 
+-- config.host couchdb db host and port 
+-- config.username couchdb username
+-- config.password couchdb password
+function _M:new(config)
+  host = config.host
+  auth_basic_hash = ngx.encode_base64(config.user .. ':' .. config.password)
   return setmetatable(_M, mt)
+end
+
+-- @param db string database name
+function _M:db(dbname)
+  database = db
+  return self
 end
 
 -- create database
