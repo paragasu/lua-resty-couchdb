@@ -41,7 +41,7 @@ function _M:db(dbname)
       ssl_verify = false
     }
     local url = create_url(path, method, params)
-    ngx.log(ngx.ERR, 'request ', url, i(args))
+    --ngx.log(ngx.ERR, 'request ', url, i(args))
     return httpc:request_uri(url, args)
   end
 
