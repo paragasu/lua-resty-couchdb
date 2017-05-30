@@ -59,7 +59,7 @@ function _M:db(dbname)
 
   -- create database
   function self:create(db)
-    request('PUT')
+    request(ngx.HTTP_PUT)
   end
 
   -- add name in the current database members list
@@ -69,17 +69,17 @@ function _M:db(dbname)
 
   -- make a couchdb get request
   function self:get(id)
-    return request('GET', id)
+    return request(ngx.HTTP_GET, id)
   end
 
   -- make a couchdb put request
   function self:put(id, data)
-    return request('PUT', id, data) 
+    return request(ngx.HTTP_PUT, id, data) 
   end
 
   -- make a couchdb post request
   function self:post(data)
-    return request('POST', nil, data)
+    return request(ngx.HTTP_POST, nil, data)
   end
 
   -- http://localhost:5984/_utils/docs/api/database/find.html
