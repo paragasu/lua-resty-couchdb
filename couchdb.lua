@@ -15,6 +15,10 @@ local mt = { __index = _M }
 -- config.username couchdb username
 -- config.password couchdb password
 function _M:new(config)
+  if not config then error("Missing couchdb config") end
+  if not config.user then error("Missing couchdb user") end
+  if not config.host then error("Missing couchdb server host") end
+  if not config.password then error("Missing couchdb password config") end
   _M.host = config.host
   _M.auth_basic_hash = ngx.encode_base64(config.user .. ':' .. config.password)
   return setmetatable(_M, mt)
@@ -32,7 +36,7 @@ function _M:db(dbname)
       body    = json.encode(params),
       headers = { 
         ['Content-Type']  = 'application/json',
-        ['Authorization'] = 'Basic ' .. auth_basic_hash
+        ['Authorization'] = 'Basic ' .. _M.auth_basic_hash
       },
       ssl_verify = false
     })
@@ -40,7 +44,7 @@ function _M:db(dbname)
 
   -- construct full url request string
   -- based on available params
-  local function create_url(id)
+  function create_url(id)
     if not database then error("Database not exists") end
     if not id then return _M.host .. '/' .. database end
     return _M.host .. '/' .. database .. '/' .. id
