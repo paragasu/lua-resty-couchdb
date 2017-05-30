@@ -11,7 +11,9 @@ description = {
    maintainer = "Jeffry L. <paragasu@gmail.com>"
 }
 dependencies = {
-   "lua >= 5.1"
+   "lua >= 5.1",
+   "lua-cjosn",
+   "lua-resty-http"
 }
 build = {
    type = "builtin",
