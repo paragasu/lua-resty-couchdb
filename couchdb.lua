@@ -29,9 +29,9 @@ function _M:db(dbname)
   local self = {}
   local database = dbname
 
-  function request(method, url, params)
+  function request(method, path, params)
     local httpc = http.new()
-    return httpc:request_uri(create_url(url), {
+    local args  = {
       method  = method, 
       body    = json.encode(params),
       headers = { 
@@ -39,15 +39,22 @@ function _M:db(dbname)
         ['Authorization'] = 'Basic ' .. _M.auth_basic_hash
       },
       ssl_verify = false
-    })
+    }
+    local url = create_url(path, method, params)
+    --ngx.log(ngx.ERR, 'request ', url, i(args))
+    return httpc:request_uri(url, args)
   end
 
   -- construct full url request string
-  -- based on available params
-  function create_url(id)
+  -- @params id doc id
+  -- @params method http method
+  -- @param params query params
+  function create_url(id, method, params)
     if not database then error("Database not exists") end
     if not id then return _M.host .. '/' .. database end
-    return _M.host .. '/' .. database .. '/' .. id
+    local url = _M.host .. '/' .. database .. '/' .. id 
+    if params == nil or method ~= ngx.HTTP_GET then return url end
+    return url .. '?' .. ngx.encode_args(params) 
   end
 
   -- create database
@@ -83,13 +90,10 @@ function _M:db(dbname)
   -- delete doc
   -- TODO: only query for existing _rev if not exists
   function self:delete(id)
-    local old = self:get(id)
-    if old then
-      local data = json.decode(old.body)
-      return request('DELETE', id, { rev = data._rev })
-    else
-      ngx.log(ngx.ERR, 'Failed to delete :' .. id .. ' not found')
-    end
+    local info, err = self:get(id)
+    if not info then error('Failed to delete :' .. id .. ' not found') end
+    local data = json.decode(info.body)
+    return request('DELETE', id, { rev = data._rev })
   end
 
   -- save document 
