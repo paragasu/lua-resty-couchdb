@@ -61,7 +61,7 @@ function _M:db(dbname)
 
   -- create database
   function self:create(db)
-    request('PUT')
+    return request('PUT')
   end
 
   -- add name in the current database members list
