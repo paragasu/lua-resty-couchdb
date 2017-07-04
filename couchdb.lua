@@ -24,6 +24,13 @@ function _M:new(config)
   return setmetatable(_M, mt)
 end
 
+function _M.get_uuid()
+  local httpc = http.new()    
+  local res, err = httpc:request_uri(_M.host .. '/_uuids', { method = GET }) 
+  if not res then return nil, err end
+  return json_decode(res)[1]
+end
+
 -- @param db string database name
 function _M:db(dbname)
   local self = {}
