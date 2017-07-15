@@ -6,7 +6,7 @@
 local http = require 'resty.http'
 local json = json or require 'cjson'
 local i  = require 'inspect'
-local _M = { __VERSION = '3.0-0' }
+local _M = { __VERSION = '3.1-2' }
 local mt = { __index = _M } 
 
 -- configuration table
