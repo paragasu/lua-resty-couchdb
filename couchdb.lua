@@ -28,7 +28,8 @@ function _M.get_uuid()
   local httpc = http.new()    
   local res, err = httpc:request_uri(_M.host .. '/_uuids', { method = GET }) 
   if not res then return nil, err end
-  return json_decode(res)[1]
+  local body = json.decode(res.body)
+  return body.uuids[1] 
 end
 
 -- @param db string database name
@@ -67,13 +68,26 @@ function _M:db(dbname)
   end
 
   -- create database
-  function self:create(db)
+  function self:create()
     return request('PUT')
+  end
+
+  function self:destroy()
+    return request('DELETE');
   end
 
   -- add name in the current database members list
   function self:add_member(name)
-    return self:put('_security', { members = { names = { name } } })
+    local res, err = self:get('_security')
+    local data = json.decode(res.body)
+    if not data.members then  
+      data.members = {}
+      data.members.names = { name } 
+    else
+      local current_members = data.members.names
+      data.members.names = table.insert(current_members, name) 
+    end
+    return self:put('_security', data)
   end
 
   -- make a couchdb get request

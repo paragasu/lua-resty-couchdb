@@ -17,7 +17,16 @@ local config  = {
 }
 local couch   = couch:new(config)
 local user = couch:db('_users')
-local res  = user:put(id, data)
+
+-- create db
+local res, err = user:create()
+
+-- add rows
+local res, err = user:post(data)
+
+-- delete db
+local res, err = user:destory()
+
 
 ```
 
@@ -64,9 +73,11 @@ Query rows of data using views
 - opts *(table)* options parameter as [documented here](http://docs.couchdb.org/en/1.6.1/api/ddoc/views.html)
 
 
-### create_db(database_name)
+### create()
 Create new database name
-- database_name *(string)* database name 
+
+### destroy()
+Delete database
 
 
 ## Reference
