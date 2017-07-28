@@ -130,14 +130,6 @@ function _M:db(dbname)
     end 
   end
 
-  -- check if value exist in a table
-  local function has_value(tbl, val)
-    for i=1, #tbl do 
-      if tbl[i] == val then return true end
-    end
-    return false
-  end
-
   -- build valid view options
   -- as in http://docs.couchdb.org/en/1.6.1/api/ddoc/views.html 
   -- key, startkey, endkey, start_key and end_key is json
@@ -146,12 +138,8 @@ function _M:db(dbname)
       return 'key="' .. opts_or_key .. '"'
     end
     local params   = {}
-    local json_key = {'key', 'startkey', 'start_key', 'endkey', 'end_key'}
     for k, v in pairs(opts_or_key) do
-      local exists = has_value(json_key, k)
-      if exists then
-        table.insert(params, k .. '=' .. v)
-      end
+      table.insert(params, k .. '=' .. v)
     end
     return table.concat(params, '&')
   end
