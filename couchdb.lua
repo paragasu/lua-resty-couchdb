@@ -149,8 +149,9 @@ function _M:db(dbname)
     local json_key = {'key', 'startkey', 'start_key', 'endkey', 'end_key'}
     for k, v in pairs(opts_or_key) do
       local exists = has_value(json_key, k)
-      local value  = exists and ngx.escape_uri(json.encode(v)) or v
-      table.insert(params, k .. '=' .. value)
+      if exists then
+        table.insert(params, k .. '=' .. v)
+      end
     end
     return table.concat(params, '&')
   end
