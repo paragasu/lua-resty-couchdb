@@ -25,6 +25,13 @@ local res, err = user:create()
 -- add rows
 local res, err = user:post(data)
 
+-- view
+local res, err = user:view('room', 'booked', {
+  inclusive_end = tostring(true), -- boolean not supported, must be string
+  start_key = '"hello"', -- double quote required by couchdb
+  end_key = '"world'
+})
+
 -- delete db
 local res, err = user:destory()
 
@@ -72,7 +79,8 @@ Query rows of data using views
 - design_name *(string)* couchdb design name
 - view_name *(string)* couchdb view name
 - opts *(table)* options parameter as [documented here](http://docs.couchdb.org/en/stable/api/ddoc/views.html).
-  Important note: start\_key and end\_key must always surrounded by double quote.
+  Important note: start\_key and end\_key must always surrounded by double quote and boolean value not supported.
+  For boolean value, it should be converted to string using lua **tostring**
 
 
 #### create()
