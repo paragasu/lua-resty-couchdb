@@ -152,8 +152,7 @@ function _M:db(dbname)
   end
 
   function self:all_docs(args)
-    local req = { '_all_docs', self:build_query_params(args) }
-    local url = table.concat(req, '/')
+    local url = '_all_docs?' ..  self:build_query_params(args)
     return self:get(url)
   end
  

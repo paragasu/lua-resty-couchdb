@@ -44,4 +44,9 @@ describe('Database', function()
     assert.are.equal(res, 'start_key=%22hello%22&end_key=%22world%22&inclusive_key=true')
   end)
 
+  it('Test all docs', function()
+    local res = db:all_docs({ inclusive_key=tostring(true), start_key='"hello"', end_key='"world"' }) 
+    assert.are.equal(res.status, 200)
+  end)
+
 end)
