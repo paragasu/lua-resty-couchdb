@@ -133,15 +133,12 @@ function _M:db(dbname)
   -- build valid view options
   -- as in http://docs.couchdb.org/en/1.6.1/api/ddoc/views.html 
   -- key, startkey, endkey, start_key and end_key is json
-  local function build_view_query(opts_or_key)
+  -- startkey or end_key must be surrounded by double quote
+  function self:build_view_query(opts_or_key)
     if type(opts_or_key) == 'string' then
       return 'key="' .. opts_or_key .. '"'
     end
-    local params   = {}
-    for k, v in pairs(opts_or_key) do
-      table.insert(params, k .. '=' .. v)
-    end
-    return table.concat(params, '&')
+    return ngx.encode_args(opts_or_key) 
   end
 
   -- query couchdb design doc
@@ -149,8 +146,9 @@ function _M:db(dbname)
   -- construct url query format /_design/design_name/_view/view_name?opts
   -- Note: the key params must be enclosed in double quotes
   function self:view(design_name, view_name, opts_or_key)
-    local req = { '_design', design_name, '_view',  view_name, '?' .. build_view_query(opts_or_key) } 
+    local req = { '_design', design_name, '_view',  view_name, '?' .. self:build_view_query(opts_or_key) } 
     local url = table.concat(req, '/')
+    ngx.log(ngx.ERR, "Get " .. i(url))
     return self:get(url)
   end
  

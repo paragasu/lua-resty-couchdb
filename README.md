@@ -31,7 +31,7 @@ local res, err = user:destory()
 ```
 
 ### API
-Please refer to the CouchDB API documentation at [docs.couchdb.org](http://docs.couchdb.org/en/1.6.1/http-api.html) for available
+Please refer to the CouchDB API documentation at [docs.couchdb.org](http://docs.couchdb.org/en/stable/http-api.html) for available
 REST API.
 
 #### configuration
@@ -70,7 +70,8 @@ Update existing data. This api will automatically get the latest rev to use for 
 Query rows of data using views
 - design_name *(string)* couchdb design name
 - view_name *(string)* couchdb view name
-- opts *(table)* options parameter as [documented here](http://docs.couchdb.org/en/1.6.1/api/ddoc/views.html)
+- opts *(table)* options parameter as [documented here](http://docs.couchdb.org/en/stable/api/ddoc/views.html),
+  important note: start\_key and end\_key must always surrounded by double quote.
 
 
 ### create()
@@ -81,6 +82,6 @@ Delete database
 
 
 ## Reference
-- [CouchDB API](http://docs.couchdb.org/en/1.6.1/http-api.html)
-- [CouchDB View Options](http://docs.couchdb.org/en/1.6.1/api/ddoc/views.html)
+- [CouchDB API](http://docs.couchdb.org/en/stable/http-api.html)
+- [CouchDB View Options](http://docs.couchdb.org/en/stable/api/ddoc/views.html)
 - [Request documentation](https://github.com/request/request)
