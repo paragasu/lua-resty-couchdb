@@ -3,12 +3,13 @@
 Lua resty minimal couchdb client
 
 #Installation 
-```
+
+```lua
 #luarocks install lua-resty-couchdb
 ```
 
 #Usage 
-```
+```lua
 local couch   = require 'resty.couchdb'
 local config  = {
   host = 'https://localhost:5984',
