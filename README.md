@@ -74,10 +74,10 @@ Query rows of data using views
   Important note: start\_key and end\_key must always surrounded by double quote.
 
 
-### create()
+#### create()
 Create new database name
 
-### destroy()
+#### destroy()
 Delete database
 
 
