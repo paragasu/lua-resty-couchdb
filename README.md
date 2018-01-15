@@ -70,8 +70,8 @@ Update existing data. This api will automatically get the latest rev to use for 
 Query rows of data using views
 - design_name *(string)* couchdb design name
 - view_name *(string)* couchdb view name
-- opts *(table)* options parameter as [documented here](http://docs.couchdb.org/en/stable/api/ddoc/views.html),
-  important note: start\_key and end\_key must always surrounded by double quote.
+- opts *(table)* options parameter as [documented here](http://docs.couchdb.org/en/stable/api/ddoc/views.html).
+  Important note: start\_key and end\_key must always surrounded by double quote.
 
 
 ### create()
