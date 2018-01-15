@@ -1,14 +1,14 @@
-#lua-resty-couchdb 
+# lua-resty-couchdb 
 
 Lua resty minimal couchdb client
 
-#Installation 
+# Installation 
 
-```lua
+```bash
 #luarocks install lua-resty-couchdb
 ```
 
-#Usage 
+# Usage 
 ```lua
 local couch   = require 'resty.couchdb'
 local config  = {
