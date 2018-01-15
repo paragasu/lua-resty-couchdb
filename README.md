@@ -28,15 +28,15 @@ local res, err = user:post(data)
 -- view
 local res, err = user:view('room', 'booked', {
   inclusive_end = tostring(true), -- boolean not supported, must be string
-  start\_key = '"hello"', -- double quote required by couchdb
-  end\_key = '"world'
+  start_key = '"hello"', -- double quote required by couchdb
+  end_key = '"world'
 })
 
 -- all docs
 local res, err = user:all\_docs({
-  inclusive\_end = tostring(true), -- boolean not supported, must be string
-  start\_key = '"hello"', -- double quote required by couchdb
-  end\_key = '"world'
+  inclusive_end = tostring(true), -- boolean not supported, must be string
+  start_key = '"hello"', -- double quote required by couchdb
+  end_key = '"world'
 })
 
 -- delete db
