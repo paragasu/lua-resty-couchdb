@@ -35,13 +35,12 @@ describe('Database', function()
   end)
 
   it('Test build view query with string', function()
-    local res = db:build_view_query('hello') 
+    local res = db:build_query_params('hello') 
     assert.are.equal(res, 'key="hello"')
   end)
 
   it('Test build view query with table', function()
-    local res = db:build_view_query({ inclusive_key=tostring(true), start_key='"hello"', end_key='"world"' }) 
-    ngx.log(ngx.ERR, i(res))
+    local res = db:build_query_params({ inclusive_key=tostring(true), start_key='"hello"', end_key='"world"' }) 
     assert.are.equal(res, 'start_key=%22hello%22&end_key=%22world%22&inclusive_key=true')
   end)
 
