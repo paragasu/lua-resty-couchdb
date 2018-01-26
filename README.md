@@ -33,7 +33,7 @@ local res, err = user:view('room', 'booked', {
 })
 
 -- all docs
-local res, err = user:all\_docs({
+local res, err = user:all_docs({
   inclusive_end = tostring(true), -- boolean not supported, must be string
   start_key = '"hello"', -- double quote required by couchdb
   end_key = '"world'
