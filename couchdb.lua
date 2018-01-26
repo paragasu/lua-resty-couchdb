@@ -6,7 +6,7 @@
 local http = require 'resty.http'
 local json = json or require 'cjson'
 local i  = require 'inspect'
-local _M = { __VERSION = '3.1-2' }
+local _M = { __VERSION = '4.0-0' }
 local mt = { __index = _M } 
 
 -- configuration table
@@ -96,8 +96,8 @@ function _M:db(dbname)
   end
 
   -- make a couchdb put request
-  function self:put(id, data)
-    return request('PUT', id, data) 
+  function self:put(data)
+    return request('PUT', data._id, data) 
   end
 
   -- make a couchdb post request
@@ -121,12 +121,12 @@ function _M:db(dbname)
 
   -- save document 
   -- automatically find out the latest rev
-  function self:save(id, data)
-    local old = self:get(id)
+  function self:save(data)
+    local old = self:get(data._id)
     if old then
       local params = json.decode(old.body)
       for k,v in pairs(data) do params[k] = v end
-      return self:put(id, params)
+      return self:put(params)
     end 
   end
 

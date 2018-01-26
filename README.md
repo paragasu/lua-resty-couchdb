@@ -60,12 +60,12 @@ Get database value
 - id document id
 - return lua table
 
-#### put(id, data)
+#### put(data)
 Insert data to database
 - id document id
 - data *(table)* data to save
 
-#### post(id, data)
+#### post(data)
 Insert data to database
 - id document id
 - data *(table)* data to save
@@ -75,7 +75,7 @@ Insert data to database
 Delete data from database
 - id document id
 
-#### save(id, data)
+#### save(data)
 Update existing data. This api will automatically get the latest rev to use for updating the data.
 - id document id
 - data *(table)* to save
