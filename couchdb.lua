@@ -60,35 +60,33 @@ function _M.db(self, database_name)
     end
   end
 
-  -- delete doc
-  -- TODO: only query for existing _rev if not exists
-  function db.delete(self, id)
-    local data, err = db:get(id)
-    if not data then error(err) end
-    return request('DELETE', id, { rev = data._rev })
+  function db.is_table(t)
+    return type(t) == 'table'
   end
 
-  -- https://www.reddit.com/r/lua/comments/417v44/efficient_table_comparison
+  -- modified from https://www.reddit.com/r/lua/comments/417v44/efficient_table_comparison
   function db.is_table_equal(a,b)
-    if #a ~= #b then return false end
     local t1,t2 = {}, {}
+    if not db.is_table(a) then return false end
+    if not db.is_table(b) then return false end
+    if #a ~= #b then return false end
     for k,v in pairs(a) do t1[k] = (t1[k] or 0) + 1 end
     for k,v in pairs(b) do t2[k] = (t2[k] or 0) + 1 end
     for k,v in pairs(t1) do if v ~= t2[k] then return false end end
+    for k,v in pairs(t2) do if v ~= t1[k] then return false end end
     return true
   end
 
   -- save document 
   -- automatically find out the latest rev
-  function db.save(self, data)
-    local old, err = db:get(data._id)
+  function db.save(self, doc)
+    local old, err = db:get(doc._id)
     local params = old or {} 
     -- only update if data has changes
-    if not db.is_table_equal(params, data) then 
-      for k,v in pairs(data) do params[k] = v end
-      return db:put(params)
-    end
-    return data
+    if db.is_table_equal(params, doc) then return doc end
+    for k,v in pairs(doc) do params[k] = v end
+    local res = db:put(params)
+    return db:get(res.id)
   end
 
   -- build valid view options
@@ -118,8 +116,9 @@ function _M.db(self, database_name)
   end
 
   function db.get(self, id) return request('GET', id) end
-  function db.put(self, data) return request('PUT', data._id, data) end
-  function db.post(self, data) return request('POST', nil, data) end
+  function db.put(self, doc) return request('PUT', doc._id, doc) end
+  function db.post(self, doc) return request('POST', nil, doc) end
+  function db.delete(self, doc) return request('DELETE', doc._id, { rev = doc._rev }) end
   function db.find(self, options) return db.post('_find', options) end
   function db.create() return request('PUT') end
   function db.destroy() return request('DELETE') end
