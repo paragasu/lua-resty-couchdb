@@ -68,18 +68,13 @@ function _M.db(self, database_name)
     return request('DELETE', id, { rev = data._rev })
   end
 
-  function db.is_table_equal(a,b) --algorithm is O(n log n), due to table growth.
-    if #a ~= #b then return false end -- early out
-    local t1,t2 = {}, {} -- temp tables
-    for k,v in pairs(a) do -- copy all values into keys for constant time lookups
-        t1[k] = (t1[k] or 0) + 1 -- make sure we track how many times we see each value.
-    end
-    for k,v in pairs(b) do
-        t2[k] = (t2[k] or 0) + 1
-    end
-    for k,v in pairs(t1) do -- go over every element
-        if v ~= t2[k] then return false end -- if the number of times that element was seen don't match...
-    end
+  -- https://www.reddit.com/r/lua/comments/417v44/efficient_table_comparison
+  function db.is_table_equal(a,b)
+    if #a ~= #b then return false end
+    local t1,t2 = {}, {}
+    for k,v in pairs(a) do t1[k] = (t1[k] or 0) + 1 end
+    for k,v in pairs(b) do t2[k] = (t2[k] or 0) + 1 end
+    for k,v in pairs(t1) do if v ~= t2[k] then return false end end
     return true
   end
 
