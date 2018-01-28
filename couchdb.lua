@@ -63,9 +63,8 @@ function _M.db(self, database_name)
   -- delete doc
   -- TODO: only query for existing _rev if not exists
   function db.delete(self, id)
-    local info, err = db:get(id)
-    if not info then error('Failed to delete :' .. id .. ' not found') end
-    local data = json.decode(info.body)
+    local data, err = db:get(id)
+    if not data then error(err) end
     return request('DELETE', id, { rev = data._rev })
   end
 
