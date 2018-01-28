@@ -5,16 +5,15 @@
 
 local http = require 'resty.http'
 local json = json or require 'cjson'
-local i  = require 'inspect'
 local _M = { __VERSION = '4.0-0' }
 local mt = { __index = _M } 
+local i  = require 'inspect'
 
--- configuration table
 -- @param config table 
 -- config.host couchdb db host and port 
 -- config.username couchdb username
 -- config.password couchdb password
-function _M:new(config)
+function _M.new(config)
   if not config then error("Missing couchdb config") end
   if not config.user then error("Missing couchdb user") end
   if not config.host then error("Missing couchdb server host") end
@@ -24,139 +23,114 @@ function _M:new(config)
   return setmetatable(_M, mt)
 end
 
-function _M.get_uuid()
-  local httpc = http.new()    
-  local res, err = httpc:request_uri(_M.host .. '/_uuids', { method = GET }) 
-  if not res then return nil, err end
-  local body = json.decode(res.body)
-  return body.uuids[1] 
-end
+local function is_table(t) return type(t) == 'table' end
 
--- @param db string database name
-function _M:db(dbname)
-  local self = {}
-  local database = dbname
+function _M.db(self, database_name)
+  local db = {}
+  local database = database_name
 
-  function request(method, path, params)
-    local httpc = http.new()
-    local args  = {
-      method  = method, 
-      body    = json.encode(params),
-      headers = { 
-        ['Content-Type']  = 'application/json',
-        ['Authorization'] = 'Basic ' .. _M.auth_basic_hash
-      },
-      ssl_verify = false
-    }
-    local url = create_url(path, method, params)
-    --ngx.log(ngx.ERR, 'request ', url, i(args))
-    return httpc:request_uri(url, args)
-  end
-
-  -- construct full url request string
-  -- @params id doc id
-  -- @params method http method
-  -- @param params query params
-  function create_url(id, method, params)
+  function db.create_url(self, path, method, params)
     if not database then error("Database not exists") end
-    if not id then return _M.host .. '/' .. database end
-    local url = _M.host .. '/' .. database .. '/' .. id 
+    if not path then return _M.host .. '/' .. database end
+    local url = _M.host .. '/' .. database .. '/' .. path 
     if params ~= nil and (method == 'GET' or method == 'DELETE') then
       return url .. '?' .. ngx.encode_args(params) 
     end
     return url
   end
 
-  -- create database
-  function self:create()
-    return request('PUT')
-  end
-
-  function self:destroy()
-    return request('DELETE');
-  end
-
-  -- add name in the current database members list
-  function self:add_member(name)
-    local res, err = self:get('_security')
-    local data = json.decode(res.body)
-    if not data.members then  
-      data.members = {}
-      data.members.names = { name } 
+  function request(method, path, params)
+    local httpc = http.new()
+    local args  = {
+    method  = method, 
+    body    = json.encode(params),
+    ssl_verify = false,
+    headers = { 
+        ['Content-Type']  = 'application/json',
+        ['Authorization'] = 'Basic ' .. _M.auth_basic_hash
+      }
+    }
+    local url = db:create_url(path, method, params)
+    local res, err = httpc:request_uri(url, args)
+    if not res then return nil, err end
+    if res.status == 200 or res.status == 201 then
+      return json.decode(res.body)
     else
-      local current_members = data.members.names
-      data.members.names = table.insert(current_members, name) 
+      return nil, json.decode(res.body)
     end
-    return self:put('_security', data)
-  end
-
-  -- make a couchdb get request
-  function self:get(id)
-    return request('GET', id)
-  end
-
-  -- make a couchdb put request
-  function self:put(data)
-    return request('PUT', data._id, data) 
-  end
-
-  -- make a couchdb post request
-  function self:post(data)
-    return request('POST', nil, data)
-  end
-
-  -- http://localhost:5984/_utils/docs/api/database/find.html
-  function self:find(options)
-    return self:post('_find', options)
   end
 
   -- delete doc
   -- TODO: only query for existing _rev if not exists
-  function self:delete(id)
-    local info, err = self:get(id)
+  function db.delete(self, id)
+    local info, err = db:get(id)
     if not info then error('Failed to delete :' .. id .. ' not found') end
     local data = json.decode(info.body)
     return request('DELETE', id, { rev = data._rev })
   end
 
+  function db.is_table_equal(a,b) --algorithm is O(n log n), due to table growth.
+    if #a ~= #b then return false end -- early out
+    local t1,t2 = {}, {} -- temp tables
+    for k,v in pairs(a) do -- copy all values into keys for constant time lookups
+        t1[k] = (t1[k] or 0) + 1 -- make sure we track how many times we see each value.
+    end
+    for k,v in pairs(b) do
+        t2[k] = (t2[k] or 0) + 1
+    end
+    for k,v in pairs(t1) do -- go over every element
+        if v ~= t2[k] then return false end -- if the number of times that element was seen don't match...
+    end
+    return true
+  end
+
   -- save document 
   -- automatically find out the latest rev
-  function self:save(data)
-    local old = self:get(data._id)
-    if old then
-      local params = json.decode(old.body)
+  function db.save(self, data)
+    local old, err = db:get(data._id)
+    local params = old or {} 
+    -- only update if data has changes
+    if not db.is_table_equal(params, data) then 
       for k,v in pairs(data) do params[k] = v end
-      return self:put(params)
-    end 
+      return db:put(params)
+    end
+    return data
   end
 
   -- build valid view options
   -- as in http://docs.couchdb.org/en/1.6.1/api/ddoc/views.html 
   -- key, startkey, endkey, start_key and end_key is json
   -- startkey or end_key must be surrounded by double quote
-  function self:build_query_params(opts_or_key)
-    if type(opts_or_key) == 'string' then
-      return 'key="' .. opts_or_key .. '"'
+  function db.build_query_params(opts_or_key)
+    if is_table(opts_or_key) then
+      return ngx.encode_args(opts_or_key) 
+    else
+      return string.format('key="%s"', opts_or_key)
     end
-    return ngx.encode_args(opts_or_key) 
   end
 
   -- query couchdb design doc
   -- opts_or_key assume option or key if string provided
   -- construct url query format /_design/design_name/_view/view_name?opts
   -- Note: the key params must be enclosed in double quotes
-  function self:view(design_name, view_name, opts_or_key)
-    local req = { '_design', design_name, '_view',  view_name, '?' .. self:build_query_params(opts_or_key) } 
+  function db:view(self, design_name, view_name, opts_or_key)
+    local req = { '_design', design_name, '_view',  view_name, '?' .. db.build_query_params(opts_or_key) } 
     local url = table.concat(req, '/')
-    return self:get(url)
+    return db:get(url)
   end
 
-  function self:all_docs(args)
-    local url = '_all_docs?' ..  self:build_query_params(args)
-    return self:get(url)
+  function db.all_docs(self, args)
+    return db:get('_all_docs?' ..  db.build_query_params(args))
   end
+
+  function db.get(self, id) return request('GET', id) end
+  function db.put(self, data) return request('PUT', data._id, data) end
+  function db.post(self, data) return request('POST', nil, data) end
+  function db.find(self, options) return db.post('_find', options) end
+  function db.create() return request('PUT') end
+  function db.destroy() return request('DELETE') end
  
-  return self 
+  return db 
 end
 
 return _M
