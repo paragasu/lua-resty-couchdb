@@ -16,7 +16,7 @@ local config  = {
   user = 'couchdb-user',
   password = 'couchdb-pass'
 }
-local couch   = couch:new(config)
+local couch   = couch.new(config)
 local user = couch:db('_users')
 
 -- create db
