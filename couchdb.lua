@@ -105,7 +105,7 @@ function _M.db(self, database_name)
   -- opts_or_key assume option or key if string provided
   -- construct url query format /_design/design_name/_view/view_name?opts
   -- Note: the key params must be enclosed in double quotes
-  function db:view(self, design_name, view_name, opts_or_key)
+  function db.view(self, design_name, view_name, opts_or_key)
     local req = { '_design', design_name, '_view',  view_name, '?' .. db.build_query_params(opts_or_key) } 
     local url = table.concat(req, '/')
     return db:get(url)
@@ -115,10 +115,14 @@ function _M.db(self, database_name)
     return db:get('_all_docs?' ..  db.build_query_params(args))
   end
 
+  function db.delete(self, doc)
+    if not is_table(doc) then return nil, 'Delete param is not a valid doc table' end
+    return request('DELETE', doc._id, { rev = doc._rev }) 
+  end
+
   function db.get(self, id) return request('GET', id) end
   function db.put(self, doc) return request('PUT', doc._id, doc) end
   function db.post(self, doc) return request('POST', nil, doc) end
-  function db.delete(self, doc) return request('DELETE', doc._id, { rev = doc._rev }) end
   function db.find(self, options) return db.post('_find', options) end
   function db.create() return request('PUT') end
   function db.destroy() return request('DELETE') end
