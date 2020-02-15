@@ -25,21 +25,46 @@ end
 
 local function is_table(t) return type(t) == 'table' end
 
+  -- modified from https://www.reddit.com/r/lua/comments/417v44/efficient_table_comparison
+local function is_table_equal(a,b)
+  local t1,t2 = {}, {}
+  if not is_table(a) then return false end
+  if not is_table(b) then return false end
+  if #a ~= #b then return false end
+  for k,v in pairs(a) do t1[k] = (t1[k] or 0) + 1 end
+  for k,v in pairs(b) do t2[k] = (t2[k] or 0) + 1 end
+  for k,v in pairs(t1) do if v ~= t2[k] then return false end end
+  for k,v in pairs(t2) do if v ~= t1[k] then return false end end
+  return true
+end
+
+local function create_url(path, method, params)
+  if not database then error("Database not exists") end
+  if not path then return _M.host .. '/' .. database end
+  local url = _M.host .. '/' .. database .. '/' .. path 
+  if params ~= nil and (method == 'GET' or method == 'DELETE') then
+    return url .. '?' .. ngx.encode_args(params) 
+  end
+  return url
+end
+
+-- build valid view options
+-- as in http://docs.couchdb.org/en/1.6.1/api/ddoc/views.html 
+-- key, startkey, endkey, start_key and end_key is json
+-- startkey or end_key must be surrounded by double quote
+local function build_query_params(opts_or_key)
+  if is_table(opts_or_key) then
+    return ngx.encode_args(opts_or_key) 
+  else
+    return string.format('key="%s"', opts_or_key)
+  end
+end
+
 function _M.db(self, database_name)
   local db = {}
   local database = database_name
 
-  function db.create_url(self, path, method, params)
-    if not database then error("Database not exists") end
-    if not path then return _M.host .. '/' .. database end
-    local url = _M.host .. '/' .. database .. '/' .. path 
-    if params ~= nil and (method == 'GET' or method == 'DELETE') then
-      return url .. '?' .. ngx.encode_args(params) 
-    end
-    return url
-  end
-
-  function request(method, path, params)
+  local function request(method, path, params)
     local httpc = http.new()
     local args  = {
     method  = method, 
@@ -60,45 +85,16 @@ function _M.db(self, database_name)
     end
   end
 
-  function db.is_table(t)
-    return type(t) == 'table'
-  end
-
-  -- modified from https://www.reddit.com/r/lua/comments/417v44/efficient_table_comparison
-  function db.is_table_equal(a,b)
-    local t1,t2 = {}, {}
-    if not db.is_table(a) then return false end
-    if not db.is_table(b) then return false end
-    if #a ~= #b then return false end
-    for k,v in pairs(a) do t1[k] = (t1[k] or 0) + 1 end
-    for k,v in pairs(b) do t2[k] = (t2[k] or 0) + 1 end
-    for k,v in pairs(t1) do if v ~= t2[k] then return false end end
-    for k,v in pairs(t2) do if v ~= t1[k] then return false end end
-    return true
-  end
-
   -- save document 
   -- automatically find out the latest rev
   function db.save(self, doc)
     local old, err = db:get(doc._id)
     local params = old or {} 
     -- only update if data has changes
-    if db.is_table_equal(params, doc) then return doc end
+    if is_table_equal(params, doc) then return doc end
     for k,v in pairs(doc) do params[k] = v end
     local res = db:put(params)
     return db:get(res.id)
-  end
-
-  -- build valid view options
-  -- as in http://docs.couchdb.org/en/1.6.1/api/ddoc/views.html 
-  -- key, startkey, endkey, start_key and end_key is json
-  -- startkey or end_key must be surrounded by double quote
-  function db.build_query_params(opts_or_key)
-    if is_table(opts_or_key) then
-      return ngx.encode_args(opts_or_key) 
-    else
-      return string.format('key="%s"', opts_or_key)
-    end
   end
 
   -- query couchdb design doc
