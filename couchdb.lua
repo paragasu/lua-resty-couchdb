@@ -75,7 +75,7 @@ function _M.db(self, database_name)
         ['Authorization'] = 'Basic ' .. _M.auth_basic_hash
       }
     }
-    local url = db:create_url(path, method, params)
+    local url = create_url(path, method, params)
     local res, err = httpc:request_uri(url, args)
     if not res then return nil, err end
     if res.status == 200 or res.status == 201 then
