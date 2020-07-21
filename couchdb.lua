@@ -102,13 +102,13 @@ function _M.db(self, database_name)
   -- construct url query format /_design/design_name/_view/view_name?opts
   -- Note: the key params must be enclosed in double quotes
   function db.view(self, design_name, view_name, opts_or_key)
-    local req = { '_design', design_name, '_view',  view_name, '?' .. db.build_query_params(opts_or_key) } 
+    local req = { '_design', design_name, '_view',  view_name, '?' .. build_query_params(opts_or_key) } 
     local url = table.concat(req, '/')
     return db:get(url)
   end
 
   function db.all_docs(self, args)
-    return db:get('_all_docs?' ..  db.build_query_params(args))
+    return db:get('_all_docs?' ..  build_query_params(args))
   end
 
   function db.delete(self, doc)
