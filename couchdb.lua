@@ -8,6 +8,7 @@ local json = json or require 'cjson'
 local _M = { __VERSION = '4.0-0' }
 local mt = { __index = _M } 
 local i  = require 'inspect'
+local database = nil
 
 -- @param config table 
 -- config.host couchdb db host and port 
@@ -62,7 +63,7 @@ end
 
 function _M.db(self, database_name)
   local db = {}
-  local database = database_name
+  database = database_name
 
   local function request(method, path, params)
     local httpc = http.new()
