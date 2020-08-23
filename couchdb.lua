@@ -5,7 +5,7 @@
 
 local http = require 'resty.http'
 local json = json or require 'cjson'
-local _M = { __VERSION = '4.0-0' }
+local _M = { __VERSION = '4.2-2' }
 local mt = { __index = _M } 
 local i  = require 'inspect'
 local database = nil
@@ -112,6 +112,10 @@ function _M.db(self, database_name)
     return db:get('_all_docs?' ..  build_query_params(args))
   end
 
+  function db.bulk_docs(self, params)
+    return db:post('_bulk_docs', params)
+  end
+
   function db.delete(self, doc)
     if not is_table(doc) then return nil, 'Delete param is not a valid doc table' end
     return request('DELETE', doc._id, { rev = doc._rev }) 
@@ -119,7 +123,7 @@ function _M.db(self, database_name)
 
   function db.get(self, id) return request('GET', id) end
   function db.put(self, doc) return request('PUT', doc._id, doc) end
-  function db.post(self, doc) return request('POST', nil, doc) end
+  function db.post(self, path, data) return request('POST', path, data) end
   function db.find(self, options) return db.post('_find', options) end
   function db.create() return request('PUT') end
   function db.destroy() return request('DELETE') end

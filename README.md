@@ -91,9 +91,13 @@ Query rows of data using views
 
 #### all_docs(opts)
 Query rows of data using bulk api
-- opts *(table)* options parameter as [documented here](http://docs.couchdb.org/en/stable/api/database/bulkapi.html).
+- opts *(table)* options parameter as [documented here](http://docs.couchdb.org/en/stable/api/database/bulk-api.html).
   Important note: start\_key and end\_key must always surrounded by double quote and boolean value not supported.
   For boolean value, it should be converted to string using lua **tostring**
+
+#### bulk_docs(opts)
+Update data using bulk api
+- opts *(table)* options parameter as [documented here](http://docs.couchdb.org/en/stable/api/database/bulk-api.html).
 
 
 #### create()
